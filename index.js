@@ -51,6 +51,16 @@ module.exports = function (chunkSize, opts) {
                 remaining.fill(0);
                 buffer = Buffer.concat([ buffer, remaining ], chunkSize);
             }
+            
+            var allData = Buffer.concat([buffer]);
+            var totalLength = allData.length;
+            var remainder = totalLength % chunkSize;
+            var cutoff = totalLength - remainder;
+            for (var i=0 ; i<cutoff ; i+=chunkSize) {
+                var chunk = allData.slice(i, i+chunkSize);
+                this.push(chunk);
+            }
+            buffer = allData.slice(cutoff, totalLength);
 
             this.push(buffer);
             next();
